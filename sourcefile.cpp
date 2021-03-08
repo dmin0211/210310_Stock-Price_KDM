@@ -1,43 +1,29 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <stack>
 
 using namespace std;
 
 vector<int> solution(vector<int> prices) {
     vector<int> answer(prices.size(),0);
-    vector <int> downIndex;
-    for(int i=0;i<prices.size()-1;i++){
-        if(prices[i]>prices[i+1]){
-            downIndex.push_back(i+1);
-        }
-    }
-    int count=0;
-    for(int i=0;i<prices.size()-1;i++){
-        if(prices[downIndex[count]]<prices[i]){
-            for(int j=i;j<downIndex[count];j++){
-                answer[j]=downIndex[count]-j;
-                i=j;
-            }
-            if(count<downIndex.size()-1){
-                count++;ㅓㅓㅓㅓ
+    stack<pair<int,int>> colStack;
+    int loopSize;
+    colStack.push({prices[0],0});
+    for(int i=1;i<prices.size()-1;i++){
+        loopSize=colStack.size();
+        for(int j=0;j<loopSize;j++){
+            if(colStack.top().first>prices[i]) {
+                answer[colStack.top().second] = i - colStack.top().second;
+                colStack.pop();
             }else break;
-
         }
+        colStack.push({prices[i],i});
     }
-    for(int i=0;i<answer.size()-1;i++){
-        if(answer[i]==0){
-            for(int j=1;j<downIndex.size();j++){
-                if(downIndex[j]>i&&prices[downIndex[j]]<prices[i]) {
-                    answer[i] = downIndex[j]-i;
-                    break;
-                }
-            }
-            if(answer[i]==0) answer[i]=answer.size()-1-i;
-
-        }
-    }
-    for(int i=0;i<answer.size();i++){
-        cout<<answer[i]<<" ";
+    loopSize=colStack.size();
+    for(int i=0;i<loopSize;i++){
+        answer[colStack.top().second]=prices.size()-1-colStack.top().second;
+        colStack.pop();
     }
     return answer;
 }
